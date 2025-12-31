@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOTES</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<style>
+        body {
+        background: rgb(36, 36, 36)
+    }
+
+    #title {
+        background: black;
+        /* margin: 100px 500px; */
+        /* padding-top:; */
+        color: white;
+        text-align: center;
+        font-size: 30px;
+        font-family: Arial, Helvetica, sans-serif;
+        border-radius: 20px;
+        height: 80px;
+    }
+
+    #area {
+        background: rgb(42, 42, 42);
+        margin: 0px 35%;
+        margin-top: 100px;
+        border-radius: 20px;
+        min-height: 500px;
+        max-height: 500px;
+        box-shadow: 0px 0px 20px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    #of {
+        max-height: 400px;
+        overflow: auto;
+        scrollbar-width: none;
+        overflow-x: hidden;
+    }
+
+
+    #l {
+        padding-top: 8px;
+    }
+
+    #controls {
+        margin-top: 10px;
+        margin-left: 7px;
+        margin-right: 7px;
+        position: sticky;
+        bottom: 0;
+    }
+
+    #add {
+        display: flexbox;
+        align-items: center;
+        justify-content: center;
+        font-size: 35px;
+        border-radius: 7px;
+        background-color: black;
+        color: white;
+        height: 40px;
+        width: 100%;
+        border: none;
+    }
+
+    @keyframes slidedown {
+        0% {
+            transform: translateX(-110%);
+            /* height: 0%; */
+            /* margin-top: 0%; */
+            margin-bottom: -11%;
+
+        }
+
+        100% {
+            transform: translateX(-110%);
+            /* height: 100%; */
+            /* margin-top: 100%; */
+            margin-bottom: 0%;
+        }
+    }
+
+    @keyframes added {
+        from {
+            transform: translateX(-100%);
+        }
+
+        to {
+            transform: translateX(0%);
+        }
+    }
+
+    @keyframes remove {
+        0% {
+            transform: translateX(0%);
+        }
+
+        100% {
+            transform: translateX(110%);
+        }
+    }
+
+    @keyframes slideup {
+        0% {
+            transform: translateX(110%);
+            margin-bottom: 0%;
+        }
+
+        100% {
+            transform: translateX(110%);
+            margin-bottom: -14%;
+        }
+    }
+
+
+    .content {
+        margin: 15px 3%;
+        display: flex;
+        align-items: center;
+    }
+
+    .slidedown {
+        animation: slidedown 0.3s ease-out forwards;
+    }
+
+    .added {
+        animation: added 0.2s ease-out forwards;
+    }
+
+    .remove {
+        animation: remove 0.2s ease-in forwards;
+        pointer-events: none;
+    }
+
+    .slideup {
+        animation: slideup 0.3s ease-out forwards;
+        pointer-events: none;
+    }
+
+    .con {
+        margin: 5px;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        ;
+        border-radius: 7px;
+        color: whitesmoke;
+        border: 2px solid rgb(70, 70, 70);
+        background-color: rgb(70, 70, 70);
+        width: 80%;
+        field-sizing: content;
+        resize: none;
+    }
+
+    .con:focus {
+        outline: 0px;
+    }
+
+    .rem {
+        font-size: 24px;
+        border-radius: 7px;
+        background-color: black;
+        color: white;
+        height: 28px;
+        width: 15%;
+        /* outline: none; */
+        border: none;
+    }
+
+    @media (max-width: 768px) {
+        #area {
+            margin: 0px;
+            margin-top: 0px;
+            border-radius: 20px;
+            min-height: 94vh;
+            max-height: 94vh;
+        }
+    }
+</style>
+<body>
+    <div id="area">
+        <div id="title">
+            <h1 id="l">NOTES</h1>
+        </div>
+        <div id="of">
+            <div id="controls">
+                <input id="add" type="button" value="+">
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    let ref = document.getElementById("controls")
+    let add = document.getElementById("add");
+    let par = document.getElementById("of");
+    let i = 0;
+    add.addEventListener("click", () => {
+        const cover = document.createElement("div")
+        cover.className = "content slidedown";
+        const note = document.createElement("textarea")
+        const butt = document.createElement("input")
+        note.className = "con";
+        note.value = "";
+        note.placeholder = "Write your idea here...";
+        butt.className = "rem";
+        butt.type = "button";
+        butt.value = "-";
+        cover.appendChild(note);
+        cover.appendChild(butt);
+        par.insertBefore(cover, ref);
+        setTimeout(() => {
+            cover.classList.add("added");
+        }, 300)
+
+    })
+    par.addEventListener("click", function (e) {
+        if (e.target.classList.contains("rem")) {
+            const pd = e.target.closest(".content");
+            pd.classList.add("remove");
+
+            setTimeout(() => {
+                pd.classList.add("slideup");
+            }, 200)
+            setTimeout(() => {
+                pd.remove();
+                save();
+            }, 400)
+        }
+    })
+    function save() {
+        const arr = [];
+        let list = document.getElementsByClassName("con");
+        for (let i = 0; i < list.length; i++) {
+            arr.push(list[i].value);
+        }
+        const str = JSON.stringify(arr);
+        localStorage.setItem("data", str);
+    }
+    let timer;
+    par.addEventListener("input", () => {
+        clearTimeout(timer);
+        timer = setTimeout(save, 1000);
+    });
+    par.addEventListener("click", () => {
+        clearTimeout(timer);
+        timer = setTimeout(save, 1000);
+    });
+    function load() {
+        const str = localStorage.getItem("data");
+        const list = JSON.parse(str);
+        for (let i = 0; i < list.length; i++) {
+            const cover = document.createElement("div")
+            cover.className = "content";
+            const note = document.createElement("textarea")
+            const butt = document.createElement("input")
+            note.className = "con";
+            note.value = list[i];
+            note.placeholder = "Write your idea here...";
+            butt.className = "rem";
+            butt.type = "button";
+            butt.value = "-";
+            cover.appendChild(note);
+            cover.appendChild(butt);
+            par.insertBefore(cover, ref);
+        }
+    }
+    window.onload = load;
+</script>
+
+</html>
